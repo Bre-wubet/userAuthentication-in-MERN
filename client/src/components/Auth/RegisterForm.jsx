@@ -1,0 +1,245 @@
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, UserCheck } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
+import { useAuth } from '../../context/AuthContext';
+
+export function RegisterForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const { register: registerUser, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const password = watch('password');
+
+  const onSubmit = async (data) => {
+    const result = await registerUser(data);
+    if (result.success) {
+      navigate('/dashboard');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Or{' '}
+            <Link
+              to="/login"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              sign in to your existing account
+            </Link>
+          </p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Get started</CardTitle>
+            <CardDescription>
+              Create a new account to get started
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      autoComplete="given-name"
+                      className="pl-10"
+                      placeholder="First name"
+                      {...register('firstName', {
+                        minLength: {
+                          value: 2,
+                          message: 'First name must be at least 2 characters',
+                        },
+                      })}
+                      error={errors.firstName?.message}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <UserCheck className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      autoComplete="family-name"
+                      className="pl-10"
+                      placeholder="Last name"
+                      {...register('lastName', {
+                        minLength: {
+                          value: 2,
+                          message: 'Last name must be at least 2 characters',
+                        },
+                      })}
+                      error={errors.lastName?.message}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                  Username
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="username"
+                    type="text"
+                    autoComplete="username"
+                    className="pl-10"
+                    placeholder="Choose a username"
+                    {...register('username', {
+                      required: 'Username is required',
+                      minLength: {
+                        value: 3,
+                        message: 'Username must be at least 3 characters',
+                      },
+                      maxLength: {
+                        value: 30,
+                        message: 'Username must be less than 30 characters',
+                      },
+                      pattern: {
+                        value: /^[a-zA-Z0-9_]+$/,
+                        message: 'Username can only contain letters, numbers, and underscores',
+                      },
+                    })}
+                    error={errors.username?.message}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email address
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    className="pl-10"
+                    placeholder="Enter your email"
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address',
+                      },
+                    })}
+                    error={errors.email?.message}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="pl-10 pr-10"
+                    placeholder="Create a password"
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 8,
+                        message: 'Password must be at least 8 characters',
+                      },
+                    })}
+                    error={errors.password?.message}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="pl-10"
+                    placeholder="Confirm your password"
+                    {...register('confirmPassword', {
+                      required: 'Please confirm your password',
+                      validate: (value) =>
+                        value === password || 'Passwords do not match',
+                    })}
+                    error={errors.confirmPassword?.message}
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating account...' : 'Create account'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

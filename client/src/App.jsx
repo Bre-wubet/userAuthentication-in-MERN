@@ -1,42 +1,86 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
-import UserDashboard from './pages/UserDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import { Navbar } from './components/layout/Navbar';
+import { LoginForm } from './components/auth/LoginForm';
+import { RegisterForm } from './components/auth/RegisterForm';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminRoles from './pages/admin/AdminRoles';
 import NotFound from './pages/NotFound';
+import './index.css';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-50">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <UserDashboard />
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/admin"
+              path="/profile"
               element={
-                <ProtectedRoute roles={['admin']}>
-                  <AdminDashboard />
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute requiredPermissions={['users.read']}>
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/roles"
+              element={
+                <ProtectedRoute requiredPermissions={['roles.read']}>
+                  <AdminRoles />
                 </ProtectedRoute>
               }
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </div>
       </AuthProvider>
     </Router>

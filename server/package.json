@@ -1,25 +1,42 @@
 {
-  "name": "mern-auth-server",
+  "name": "reusable-auth-server",
   "version": "1.0.0",
-  "description": "MERN Authentication Server",
+  "description": "Reusable Authentication Server with PostgreSQL and Prisma",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force"
   },
-  "keywords": [],
+  "keywords": [
+    "authentication",
+    "authorization",
+    "prisma",
+    "postgresql",
+    "reusable"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/client": "^6.16.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3"
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.2"
   }
 }
