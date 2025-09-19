@@ -160,7 +160,7 @@ export function AuthProvider({ children }) {
     // Optional: best-effort server notification without blocking UX
     // Fire and forget; ignore failures
     try {
-      const refreshToken = sessionStorage.getItem('refreshToken') || '';
+      const refreshToken = localStorage.getItem('refreshToken') || '';
       if (refreshToken) {
         fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000/api') + '/auth/logout', {
           method: 'POST',
