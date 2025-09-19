@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Menu, 
@@ -8,20 +8,39 @@ import {
   LogOut, 
   Shield, 
   Users,
-  Home
+  Home,
+  ChevronDown,
+  KeyRound,
+  MonitorPause
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../context/AuthContext';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { user, isAuthenticated, logout, hasRole, hasPermission } = useAuth();
   const navigate = useNavigate();
+  const settingsRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
+
+  // Close settings dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setIsSettingsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
@@ -29,13 +48,20 @@ export function Navbar() {
   ];
 
   const adminNavigation = [
+    { name: 'Admin', href: '/admin', icon: Settings, role: 'admin' },
     { name: 'Users', href: '/admin/users', icon: Users, permission: 'users.read' },
     { name: 'Roles', href: '/admin/roles', icon: Shield, permission: 'roles.read' },
   ];
 
-  const filteredAdminNavigation = adminNavigation.filter(item => 
-    !item.permission || hasPermission(item.permission)
-  );
+  const filteredAdminNavigation = adminNavigation.filter(item => {
+    if (item.role) {
+      return hasRole(item.role);
+    }
+    if (item.permission) {
+      return hasPermission(item.permission);
+    }
+    return true;
+  });
 
   return (
     <nav className="bg-white shadow-lg">
@@ -89,15 +115,59 @@ export function Navbar() {
                       {user?.roles?.[0] || 'user'}
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLogout}
-                    className="flex items-center"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
+                  
+                  {/* Settings Dropdown */}
+                  <div className="relative" ref={settingsRef}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                      className="flex items-center"
+                    >
+                      <Settings className="h-4 w-4 mr-1" />
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                    
+                    {isSettingsOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsSettingsOpen(false)}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          Profile
+                        </Link>
+                        <Link
+                          to="/settings/change-password"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsSettingsOpen(false)}
+                        >
+                          <KeyRound className="h-4 w-4 mr-2" />
+                          Change Password
+                        </Link>
+                        <Link
+                          to="/settings/sessions"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsSettingsOpen(false)}
+                        >
+                          <MonitorPause className="h-4 w-4 mr-2" />
+                          Sessions
+                        </Link>
+                        <hr className="my-1" />
+                        <button
+                          onClick={() => {
+                            setIsSettingsOpen(false);
+                            handleLogout();
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -208,6 +278,31 @@ export function Navbar() {
                   </div>
                 </div>
                 <div className="mt-3 space-y-1">
+                  <Link
+                    to="/profile"
+                    className="flex items-center px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <User className="h-4 w-4 mr-3" />
+                    Profile
+                  </Link>
+                  <Link
+                    to="/settings/change-password"
+                    className="flex items-center px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <KeyRound className="h-4 w-4 mr-3" />
+                    Change Password
+                  </Link>
+                  <Link
+                    to="/settings/sessions"
+                    className="flex items-center px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <MonitorPause className="h-4 w-4 mr-3" />
+                    Sessions
+                  </Link>
+                  <hr className="my-2" />
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
