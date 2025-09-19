@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { LoginForm } from './components/auth/LoginForm';
@@ -18,13 +19,16 @@ import Sessions from './pages/Sessions';
 import NotFound from './pages/NotFound';
 import './index.css';
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <Routes>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
@@ -87,8 +91,8 @@ function App() {
               }
             />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster
+            </Routes>
+            <Toaster
             position="top-right"
             toastOptions={{
               duration: 4000,
@@ -111,9 +115,10 @@ function App() {
                 },
               },
             }}
-          />
-        </div>
-      </AuthProvider>
+            />
+          </div>
+        </AuthProvider>
+      </QueryClientProvider>
     </Router>
   );
 }
